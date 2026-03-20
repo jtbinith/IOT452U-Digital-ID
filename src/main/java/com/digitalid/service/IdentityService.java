@@ -39,13 +39,15 @@ public class IdentityService {
         this.idGenerator = idGenerator;
     }
 
-    public DigitalID createIdentity(String firstName, String surname, String gender, String dob, String nationality, OrganisationType org) {
+    public DigitalID createIdentity(String firstName, String surname, String gender, String dob,
+                                     String nationality, String address, String postcode, OrganisationType org) {
         if (!authService.canModifyIdentity(org)) {
             throw new UnauthorisedAccessException(org, "create identity");
         }
         String id = idGenerator.generateId();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        DigitalID identity = new DigitalID(id, firstName, surname, gender, LocalDate.parse(dob, formatter), nationality);
+        DigitalID identity = new DigitalID(id, firstName, surname, gender, LocalDate.parse(dob, formatter),
+                                           nationality, address, postcode);
         repository.save(identity);
         auditService.recordEvent("IDENTITY_CREATED", id, org, "SUCCESS");
         return identity;
@@ -71,6 +73,17 @@ public class IdentityService {
         identity.updateAddress(address);
         repository.save(identity);
         auditService.recordEvent("IDENTITY_UPDATED", id, org, "ADDRESS changed to " + address);
+    }
+
+    public void updatePostcode(String id, String postcode, OrganisationType org) {
+        if (!authService.canModifyIdentity(org)) {
+            throw new UnauthorisedAccessException(org, "update identity");
+        }
+        attributeRule.validateMutable(IdentityAttribute.POSTCODE);
+        DigitalID identity = findIdentityOrThrow(id);
+        identity.updatePostcode(postcode);
+        repository.save(identity);
+        auditService.recordEvent("IDENTITY_UPDATED", id, org, "POSTCODE changed to " + postcode);
     }
 
     public void suspendIdentity(String id, OrganisationType org) {

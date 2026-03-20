@@ -9,5 +9,6 @@ public enum IdentityAttribute {
     GENDER,
     DATE_OF_BIRTH,
     NATIONALITY,
-    ADDRESS
+    ADDRESS,
+    POSTCODE
 }

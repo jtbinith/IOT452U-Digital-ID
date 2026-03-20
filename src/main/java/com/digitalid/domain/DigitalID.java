@@ -12,18 +12,21 @@ public class DigitalID {
     private final LocalDate dateOfBirth;
     private String nationality;
     private String address;
+    private String postcode;
     private IdentityStatus status;
     private boolean restricted;
     private final LocalDate createdDate;
 
-    public DigitalID(String id, String firstName, String surname, String gender, LocalDate dateOfBirth, String nationality) {
+    public DigitalID(String id, String firstName, String surname, String gender, LocalDate dateOfBirth,
+                     String nationality, String address, String postcode) {
         this.id = id;
         this.firstName = firstName;
         this.surname = surname;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.nationality = nationality;
-        this.address = "";
+        this.address = address;
+        this.postcode = postcode;
         this.status = IdentityStatus.ACTIVE;
         this.restricted = false;
         this.createdDate = LocalDate.now();
@@ -65,6 +68,13 @@ public class DigitalID {
         this.address = address;
     }
 
+    public void updatePostcode(String postcode) {
+        if (this.status == IdentityStatus.REVOKED) {
+            throw new InvalidStatusTransitionException(this.id, this.status, this.status);
+        }
+        this.postcode = postcode;
+    }
+
     public void setRestriction(boolean restricted) {
         if (this.status == IdentityStatus.REVOKED) {
             throw new InvalidStatusTransitionException(this.id, this.status, this.status);
@@ -87,6 +97,7 @@ public class DigitalID {
     public LocalDate getDateOfBirth() { return dateOfBirth; }
     public String getNationality() { return nationality; }
     public String getAddress() { return address; }
+    public String getPostcode() { return postcode; }
     public IdentityStatus getStatus() { return status; }
     public LocalDate getCreatedDate() { return createdDate; }
 }

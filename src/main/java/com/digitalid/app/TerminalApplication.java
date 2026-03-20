@@ -90,17 +90,19 @@ public class TerminalApplication {
         System.out.println("        " + formatOrgName(currentOrganisation) + " Menu");
         System.out.println("========================================");
         System.out.println("  1. Create Identity");
-        System.out.println("  2. Verify Identity");
-        System.out.println("  3. Switch Organisation");
-        System.out.println("  4. Exit");
+        System.out.println("  2. Update Identity");
+        System.out.println("  3. Verify Identity");
+        System.out.println("  4. Switch Organisation");
+        System.out.println("  5. Exit");
         System.out.print("\nChoice: ");
 
         int choice = readInt();
         switch (choice) {
             case 1 -> handleCreateIdentity();
-            case 2 -> handleVerifyIdentity();
-            case 3 -> selectOrganisation();
-            case 4 -> { return false; }
+            case 2 -> handleUpdateIdentity();
+            case 3 -> handleVerifyIdentity();
+            case 4 -> selectOrganisation();
+            case 5 -> { return false; }
             default -> System.out.println("Invalid choice.");
         }
         return true;
@@ -129,9 +131,15 @@ public class TerminalApplication {
         System.out.println("\n--- Create New Identity ---\n");
         String firstName = readNonEmpty("Enter first name: ");
         String surname = readNonEmpty("Enter surname: ");
-        String gender = readNonEmpty("Enter gender (Male/Female/Other): ");
+        String gender = readValidGender("Enter gender (M)ale / (F)emale / (X) Other: ");
         String dob = readValidDob("Enter date of birth (DD-MM-YYYY): ");
         String nationality = readNonEmpty("Enter nationality (e.g. British, Irish, French): ");
+        System.out.print("Enter address (or press Enter to skip): ");
+        String address = scanner.nextLine().trim();
+        String postcode = "";
+        if (!address.isEmpty()) {
+            postcode = readValidPostcode("Enter postcode: ");
+        }
 
         while (true) {
             System.out.println("\n--- Review Identity ---\n");
@@ -140,19 +148,27 @@ public class TerminalApplication {
             System.out.println("  3. Gender:      " + gender);
             System.out.println("  4. DOB:         " + dob);
             System.out.println("  5. Nationality: " + nationality);
+            System.out.println("  6. Address:     " + (address.isEmpty() ? "(none)" : address));
+            System.out.println("  7. Postcode:    " + (postcode.isEmpty() ? "(none)" : postcode));
             System.out.print("\n(S)ubmit / (E)dit / (C)ancel: ");
             String choice = scanner.nextLine().trim().toUpperCase();
 
             switch (choice) {
                 case "S" -> {
+                    if (!address.isEmpty() && postcode.isEmpty()) {
+                        System.out.println("ERROR: Postcode is required when an address is provided. Please edit field 7.");
+                        continue;
+                    }
                     try {
-                        DigitalID identity = identityService.createIdentity(firstName, surname, gender, dob, nationality, currentOrganisation);
+                        DigitalID identity = identityService.createIdentity(firstName, surname, gender, dob, nationality, address, postcode, currentOrganisation);
                         System.out.println("\nSUCCESS: Identity created");
                         System.out.println("  ID:          " + identity.getId());
                         System.out.println("  Name:        " + identity.getFullName());
                         System.out.println("  Gender:      " + identity.getGender());
                         System.out.println("  DOB:         " + identity.getDateOfBirth().format(DATE_FORMAT));
                         System.out.println("  Nationality: " + identity.getNationality());
+                        System.out.println("  Address:     " + (identity.getAddress().isEmpty() ? "(none)" : identity.getAddress()));
+                        System.out.println("  Postcode:    " + (identity.getPostcode().isEmpty() ? "(none)" : identity.getPostcode()));
                         System.out.println("  Status:      " + identity.getStatus());
                         System.out.println("  Created:     " + identity.getCreatedDate().format(DATE_FORMAT));
                     } catch (Exception e) {
@@ -163,14 +179,30 @@ public class TerminalApplication {
                     return;
                 }
                 case "E" -> {
-                    System.out.print("Enter field number to edit (1-5): ");
+                    System.out.print("Enter field number to edit (1-7): ");
                     int field = readInt();
                     switch (field) {
                         case 1 -> firstName = readNonEmpty("Enter first name: ");
                         case 2 -> surname = readNonEmpty("Enter surname: ");
-                        case 3 -> gender = readNonEmpty("Enter gender (Male/Female/Other): ");
+                        case 3 -> gender = readValidGender("Enter gender (M)ale / (F)emale / (X) Other: ");
                         case 4 -> dob = readValidDob("Enter date of birth (DD-MM-YYYY): ");
                         case 5 -> nationality = readNonEmpty("Enter nationality (e.g. British, Irish, French): ");
+                        case 6 -> {
+                            System.out.print("Enter address (or press Enter to clear): ");
+                            address = scanner.nextLine().trim();
+                            if (address.isEmpty()) {
+                                postcode = "";
+                            } else if (postcode.isEmpty()) {
+                                postcode = readValidPostcode("Enter postcode: ");
+                            }
+                        }
+                        case 7 -> {
+                            if (address.isEmpty()) {
+                                System.out.println("ERROR: Cannot set postcode without an address.");
+                            } else {
+                                postcode = readValidPostcode("Enter postcode: ");
+                            }
+                        }
                         default -> System.out.println("Invalid field number.");
                     }
                 }
@@ -185,6 +217,52 @@ public class TerminalApplication {
         }
     }
 
+
+    private void handleUpdateIdentity() {
+        System.out.println("\n--- Update Identity ---\n");
+        System.out.print("Enter Digital ID: ");
+        String id = scanner.nextLine().trim();
+
+        try {
+            DigitalID identity = identityService.findIdentity(id);
+            System.out.println("\nCurrent Details:");
+            System.out.println("  Name:        " + identity.getFullName());
+            System.out.println("  Nationality: " + identity.getNationality());
+            System.out.println("  Address:     " + (identity.getAddress().isEmpty() ? "(none)" : identity.getAddress()));
+            System.out.println("  Postcode:    " + (identity.getPostcode().isEmpty() ? "(none)" : identity.getPostcode()));
+
+            System.out.println("\nWhat would you like to update?");
+            System.out.println("  1. Nationality");
+            System.out.println("  2. Address");
+            System.out.println("  3. Postcode");
+            System.out.print("\nChoice: ");
+            int field = readInt();
+
+            switch (field) {
+                case 1 -> {
+                    String nationality = readNonEmpty("Enter new nationality: ");
+                    identityService.updateNationality(id, nationality, currentOrganisation);
+                    System.out.println("\nSUCCESS: Nationality updated to '" + nationality + "'");
+                }
+                case 2 -> {
+                    String address = readNonEmpty("Enter new address: ");
+                    identityService.updateAddress(id, address, currentOrganisation);
+                    System.out.println("\nSUCCESS: Address updated to '" + address + "'");
+                }
+                case 3 -> {
+                    String postcode = readNonEmpty("Enter new postcode: ");
+                    identityService.updatePostcode(id, postcode, currentOrganisation);
+                    System.out.println("\nSUCCESS: Postcode updated to '" + postcode + "'");
+                }
+                default -> System.out.println("Invalid choice.");
+            }
+        } catch (Exception e) {
+            System.out.println("\nERROR: " + e.getMessage());
+        }
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
     private void handleVerifyIdentity() {
         System.out.println("\n--- Verify Identity ---\n");
         System.out.print("Enter Digital ID: ");
@@ -199,7 +277,8 @@ public class TerminalApplication {
                 System.out.println("  Gender:      " + identity.getGender());
                 System.out.println("  DOB:         " + identity.getDateOfBirth().format(DATE_FORMAT));
                 System.out.println("  Nationality: " + identity.getNationality());
-                System.out.println("  Address:     " + identity.getAddress());
+                System.out.println("  Address:     " + (identity.getAddress().isEmpty() ? "(none)" : identity.getAddress()));
+                System.out.println("  Postcode:    " + (identity.getPostcode().isEmpty() ? "(none)" : identity.getPostcode()));
                 System.out.println("  Status:      " + identity.getStatus());
                 System.out.println("  Restricted:  " + (identity.isRestricted() ? "Yes" : "No"));
                 System.out.println("  Created:     " + identity.getCreatedDate().format(DATE_FORMAT));
@@ -254,6 +333,29 @@ public class TerminalApplication {
             } catch (DateTimeParseException e) {
                 System.out.println("ERROR: Invalid date format. Please use DD-MM-YYYY.");
             }
+        }
+    }
+
+    private String readValidGender(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim().toUpperCase();
+            switch (input) {
+                case "M", "MALE" -> { return "Male"; }
+                case "F", "FEMALE" -> { return "Female"; }
+                case "X", "OTHER" -> { return "Other"; }
+                default -> System.out.println("ERROR: Please enter Male/M, Female/F, or Other/X.");
+            }
+        }
+    }
+
+    private String readValidPostcode(String prompt) {
+        while (true) {
+            String input = readNonEmpty(prompt).replaceAll("\\s+", "").toUpperCase();
+            if (input.matches("^[A-Z]{1,2}[0-9][0-9A-Z]?[0-9][A-Z]{2}$")) {
+                return input.substring(0, input.length() - 3) + " " + input.substring(input.length() - 3);
+            }
+            System.out.println("ERROR: Invalid UK postcode format (e.g. E1 7AA, CB1 3AB).");
         }
     }
 
