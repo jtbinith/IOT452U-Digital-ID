@@ -127,25 +127,11 @@ public class TerminalApplication {
 
     private void handleCreateIdentity() {
         System.out.println("\n--- Create New Identity ---\n");
-        System.out.print("Enter first name: ");
-        String firstName = scanner.nextLine();
-        System.out.print("Enter surname: ");
-        String surname = scanner.nextLine();
-        System.out.print("Enter gender (Male/Female/Other): ");
-        String gender = scanner.nextLine();
-        System.out.print("Enter date of birth (DD-MM-YYYY): ");
-        String dob = scanner.nextLine();
-        System.out.print("Enter nationality: ");
-        String nationality = scanner.nextLine();
-
-        try {
-            LocalDate.parse(dob, DATE_FORMAT);
-        } catch (DateTimeParseException e) {
-            System.out.println("\nERROR: Invalid date format. Please use DD-MM-YYYY");
-            System.out.println("\nPress Enter to continue...");
-            scanner.nextLine();
-            return;
-        }
+        String firstName = readNonEmpty("Enter first name: ");
+        String surname = readNonEmpty("Enter surname: ");
+        String gender = readNonEmpty("Enter gender (Male/Female/Other): ");
+        String dob = readValidDob("Enter date of birth (DD-MM-YYYY): ");
+        String nationality = readNonEmpty("Enter nationality (e.g. British, Irish, French): ");
 
         while (true) {
             System.out.println("\n--- Review Identity ---\n");
@@ -180,20 +166,11 @@ public class TerminalApplication {
                     System.out.print("Enter field number to edit (1-5): ");
                     int field = readInt();
                     switch (field) {
-                        case 1 -> { System.out.print("Enter first name: "); firstName = scanner.nextLine(); }
-                        case 2 -> { System.out.print("Enter surname: "); surname = scanner.nextLine(); }
-                        case 3 -> { System.out.print("Enter gender (Male/Female/Other): "); gender = scanner.nextLine(); }
-                        case 4 -> {
-                            System.out.print("Enter date of birth (DD-MM-YYYY): ");
-                            String newDob = scanner.nextLine();
-                            try {
-                                LocalDate.parse(newDob, DATE_FORMAT);
-                                dob = newDob;
-                            } catch (DateTimeParseException e) {
-                                System.out.println("ERROR: Invalid date format. Please use DD-MM-YYYY");
-                            }
-                        }
-                        case 5 -> { System.out.print("Enter nationality: "); nationality = scanner.nextLine(); }
+                        case 1 -> firstName = readNonEmpty("Enter first name: ");
+                        case 2 -> surname = readNonEmpty("Enter surname: ");
+                        case 3 -> gender = readNonEmpty("Enter gender (Male/Female/Other): ");
+                        case 4 -> dob = readValidDob("Enter date of birth (DD-MM-YYYY): ");
+                        case 5 -> nationality = readNonEmpty("Enter nationality (e.g. British, Irish, French): ");
                         default -> System.out.println("Invalid field number.");
                     }
                 }
@@ -247,6 +224,36 @@ public class TerminalApplication {
             return Integer.parseInt(line.trim());
         } catch (NumberFormatException e) {
             return -1;
+        }
+    }
+
+    private String readNonEmpty(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            if (!input.isEmpty()) {
+                return input;
+            }
+            System.out.println("ERROR: This field cannot be empty.");
+        }
+    }
+
+    private String readValidDob(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            try {
+                LocalDate dob = LocalDate.parse(input, DATE_FORMAT);
+                if (dob.isAfter(LocalDate.now())) {
+                    System.out.println("ERROR: Date of birth cannot be in the future.");
+                } else if (dob.isBefore(LocalDate.of(1900, 1, 1))) {
+                    System.out.println("ERROR: Date of birth cannot be before 01-01-1900.");
+                } else {
+                    return input;
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("ERROR: Invalid date format. Please use DD-MM-YYYY.");
+            }
         }
     }
 
