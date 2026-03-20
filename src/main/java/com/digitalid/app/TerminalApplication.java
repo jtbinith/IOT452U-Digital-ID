@@ -140,23 +140,72 @@ public class TerminalApplication {
 
         try {
             LocalDate.parse(dob, DATE_FORMAT);
-            DigitalID identity = identityService.createIdentity(firstName, surname, gender, dob, nationality, currentOrganisation);
-            System.out.println("\nSUCCESS: Identity created");
-            System.out.println("  ID:          " + identity.getId());
-            System.out.println("  Name:        " + identity.getFullName());
-            System.out.println("  Gender:      " + identity.getGender());
-            System.out.println("  DOB:         " + identity.getDateOfBirth().format(DATE_FORMAT));
-            System.out.println("  Nationality: " + identity.getNationality());
-            System.out.println("  Status:      " + identity.getStatus());
-            System.out.println("  Created:     " + identity.getCreatedDate().format(DATE_FORMAT));
         } catch (DateTimeParseException e) {
             System.out.println("\nERROR: Invalid date format. Please use DD-MM-YYYY");
-        } catch (Exception e) {
-            System.out.println("\nERROR: " + e.getMessage());
+            System.out.println("\nPress Enter to continue...");
+            scanner.nextLine();
+            return;
         }
 
-        System.out.println("\nPress Enter to continue..."); // TODO: add a view, edit, submit flow
-        scanner.nextLine();
+        while (true) {
+            System.out.println("\n--- Review Identity ---\n");
+            System.out.println("  1. First Name:  " + firstName);
+            System.out.println("  2. Surname:     " + surname);
+            System.out.println("  3. Gender:      " + gender);
+            System.out.println("  4. DOB:         " + dob);
+            System.out.println("  5. Nationality: " + nationality);
+            System.out.print("\n(S)ubmit / (E)dit / (C)ancel: ");
+            String choice = scanner.nextLine().trim().toUpperCase();
+
+            switch (choice) {
+                case "S" -> {
+                    try {
+                        DigitalID identity = identityService.createIdentity(firstName, surname, gender, dob, nationality, currentOrganisation);
+                        System.out.println("\nSUCCESS: Identity created");
+                        System.out.println("  ID:          " + identity.getId());
+                        System.out.println("  Name:        " + identity.getFullName());
+                        System.out.println("  Gender:      " + identity.getGender());
+                        System.out.println("  DOB:         " + identity.getDateOfBirth().format(DATE_FORMAT));
+                        System.out.println("  Nationality: " + identity.getNationality());
+                        System.out.println("  Status:      " + identity.getStatus());
+                        System.out.println("  Created:     " + identity.getCreatedDate().format(DATE_FORMAT));
+                    } catch (Exception e) {
+                        System.out.println("\nERROR: " + e.getMessage());
+                    }
+                    System.out.println("\nPress Enter to continue...");
+                    scanner.nextLine();
+                    return;
+                }
+                case "E" -> {
+                    System.out.print("Enter field number to edit (1-5): ");
+                    int field = readInt();
+                    switch (field) {
+                        case 1 -> { System.out.print("Enter first name: "); firstName = scanner.nextLine(); }
+                        case 2 -> { System.out.print("Enter surname: "); surname = scanner.nextLine(); }
+                        case 3 -> { System.out.print("Enter gender (Male/Female/Other): "); gender = scanner.nextLine(); }
+                        case 4 -> {
+                            System.out.print("Enter date of birth (DD-MM-YYYY): ");
+                            String newDob = scanner.nextLine();
+                            try {
+                                LocalDate.parse(newDob, DATE_FORMAT);
+                                dob = newDob;
+                            } catch (DateTimeParseException e) {
+                                System.out.println("ERROR: Invalid date format. Please use DD-MM-YYYY");
+                            }
+                        }
+                        case 5 -> { System.out.print("Enter nationality: "); nationality = scanner.nextLine(); }
+                        default -> System.out.println("Invalid field number.");
+                    }
+                }
+                case "C" -> {
+                    System.out.println("\nIdentity creation cancelled.");
+                    System.out.println("\nPress Enter to continue...");
+                    scanner.nextLine();
+                    return;
+                }
+                default -> System.out.println("Invalid choice. Please enter S, E, or C.");
+            }
+        }
     }
 
     private void handleVerifyIdentity() {
