@@ -1,0 +1,42 @@
+package com.digitalid.service;
+
+import java.util.HashMap;
+import java.util.Map;
+import com.digitalid.domain.DigitalID;
+import com.digitalid.domain.OrganisationType;
+import com.digitalid.repository.IdentityRepository;
+import com.digitalid.audit.AuditService;
+import com.digitalid.verification.*;
+import com.digitalid.exception.IdentityNotFoundException;
+
+public class VerificationService {
+
+    private final IdentityRepository repository;
+    private final AuditService auditService;
+    private final Map<OrganisationType, VerificationStrategy> strategies;
+
+    public VerificationService(IdentityRepository repository, AuditService auditService) {
+        this.repository = repository;
+        this.auditService = auditService;
+        this.strategies = new HashMap<>();
+        strategies.put(OrganisationType.EMPLOYER, new EmployerVerificationStrategy());
+        strategies.put(OrganisationType.BANK, new BankVerificationStrategy());
+        strategies.put(OrganisationType.TAX_AUTHORITY, new TaxAuthorityVerificationStrategy());
+        strategies.put(OrganisationType.DRIVING_AUTHORITY, new DrivingAuthorityVerificationStrategy());
+    }
+
+    public VerificationResult verifyIdentity(String id, OrganisationType org) {
+        DigitalID identity = repository.findById(id);
+        if (identity == null) {
+            throw new IdentityNotFoundException(id);
+        }
+
+        VerificationStrategy strategy = strategies.get(org);
+        VerificationResult result = strategy.verify(identity);
+
+        auditService.recordEvent("VERIFICATION_REQUESTED", id, org,
+            result.isValid() ? "VALID" : "INVALID - " + result.getReason());
+
+        return result;
+    }
+}
