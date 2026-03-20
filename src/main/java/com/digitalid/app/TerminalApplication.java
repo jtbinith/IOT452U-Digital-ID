@@ -91,18 +91,20 @@ public class TerminalApplication {
         System.out.println("========================================");
         System.out.println("  1. Create Identity");
         System.out.println("  2. Update Identity");
-        System.out.println("  3. Verify Identity");
-        System.out.println("  4. Switch Organisation");
-        System.out.println("  5. Exit");
+        System.out.println("  3. Change Status");
+        System.out.println("  4. Verify Identity");
+        System.out.println("  5. Switch Organisation");
+        System.out.println("  6. Exit");
         System.out.print("\nChoice: ");
 
         int choice = readInt();
         switch (choice) {
             case 1 -> handleCreateIdentity();
             case 2 -> handleUpdateIdentity();
-            case 3 -> handleVerifyIdentity();
-            case 4 -> selectOrganisation();
-            case 5 -> { return false; }
+            case 3 -> handleChangeStatus();
+            case 4 -> handleVerifyIdentity();
+            case 5 -> selectOrganisation();
+            case 6 -> { return false; }
             default -> System.out.println("Invalid choice.");
         }
         return true;
@@ -255,6 +257,53 @@ public class TerminalApplication {
                     System.out.println("\nSUCCESS: Postcode updated to '" + postcode + "'");
                 }
                 default -> System.out.println("Invalid choice.");
+            }
+        } catch (Exception e) {
+            System.out.println("\nERROR: " + e.getMessage());
+        }
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    private void handleChangeStatus() {
+        System.out.println("\n--- Change Identity Status ---\n");
+        System.out.print("Enter Digital ID: ");
+        String id = scanner.nextLine().trim();
+
+        try {
+            DigitalID identity = identityService.findIdentity(id);
+            System.out.println("\n  Name:   " + identity.getFullName());
+            System.out.println("  Status: " + identity.getStatus());
+
+            if (identity.isRevoked()) {
+                System.out.println("\nThis identity has been revoked and cannot be changed.");
+            } else {
+                System.out.println("\nAvailable actions:");
+                int option = 1;
+                if (identity.isActive()) {
+                    System.out.println("  " + option++ + ". Suspend");
+                    System.out.println("  " + option++ + ". Revoke");
+                } else if (identity.isSuspended()) {
+                    System.out.println("  " + option++ + ". Activate");
+                    System.out.println("  " + option++ + ". Revoke");
+                }
+                System.out.print("\nChoice: ");
+                int choice = readInt();
+
+                if (identity.isActive()) {
+                    switch (choice) {
+                        case 1 -> { identityService.suspendIdentity(id, currentOrganisation); System.out.println("\nSUCCESS: Identity suspended."); }
+                        case 2 -> { identityService.revokeIdentity(id, currentOrganisation); System.out.println("\nSUCCESS: Identity revoked."); }
+                        default -> System.out.println("Invalid choice.");
+                    }
+                } else if (identity.isSuspended()) {
+                    switch (choice) {
+                        case 1 -> { identityService.activateIdentity(id, currentOrganisation); System.out.println("\nSUCCESS: Identity activated."); }
+                        case 2 -> { identityService.revokeIdentity(id, currentOrganisation); System.out.println("\nSUCCESS: Identity revoked."); }
+                        default -> System.out.println("Invalid choice.");
+                    }
+                }
             }
         } catch (Exception e) {
             System.out.println("\nERROR: " + e.getMessage());
