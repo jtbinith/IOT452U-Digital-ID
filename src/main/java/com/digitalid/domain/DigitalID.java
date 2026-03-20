@@ -2,6 +2,8 @@ package com.digitalid.domain;
 
 import java.time.LocalDate;
 
+import com.digitalid.exception.InvalidStatusTransitionException;
+
 public class DigitalID {
     private final String id;
     private final String name;
@@ -19,6 +21,7 @@ public class DigitalID {
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.nationality = nationality;
+        this.address = "";
         this.status = IdentityStatus.ACTIVE;
         this.restricted = false;
         this.createdDate = LocalDate.now();
@@ -28,7 +31,7 @@ public class DigitalID {
 
     public void activate() {
         if (this.status == IdentityStatus.REVOKED) {
-            throw new IllegalStateException("Cannot activate a revoked identity");
+            throw new InvalidStatusTransitionException(this.id, this.status, IdentityStatus.ACTIVE);
         }
 
         this.status = IdentityStatus.ACTIVE;
@@ -36,7 +39,7 @@ public class DigitalID {
 
     public void suspend() {
         if (this.status == IdentityStatus.REVOKED) {
-            throw new IllegalStateException("Cannot suspend a revoked identity");
+            throw new InvalidStatusTransitionException(this.id, this.status, IdentityStatus.SUSPENDED);
         }
         this.status = IdentityStatus.SUSPENDED;
     }
@@ -48,21 +51,21 @@ public class DigitalID {
     // update methods
     public void updateNationality(String nationality) {
         if (this.status == IdentityStatus.REVOKED) {
-            throw new IllegalStateException("Cannot update a revoked identity");
+            throw new InvalidStatusTransitionException(this.id, this.status, this.status);
         }
         this.nationality = nationality;
     }
 
     public void updateAddress(String address) {
         if (this.status == IdentityStatus.REVOKED) {
-            throw new IllegalStateException("Cannot update a revoked identity");
+            throw new InvalidStatusTransitionException(this.id, this.status, this.status);
         }
         this.address = address;
     }
 
     public void setRestriction(boolean restricted) {
         if (this.status == IdentityStatus.REVOKED) {
-            throw new IllegalStateException("Cannot modify a revoked identity");
+            throw new InvalidStatusTransitionException(this.id, this.status, this.status);
         }
         this.restricted = restricted;
     }
