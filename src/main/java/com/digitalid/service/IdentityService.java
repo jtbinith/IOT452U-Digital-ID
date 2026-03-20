@@ -1,6 +1,7 @@
 package com.digitalid.service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,8 @@ public class IdentityService {
             throw new UnauthorisedAccessException(org, "create identity");
         }
         String id = idGenerator.generateId();
-        DigitalID identity = new DigitalID(id, name, gender, LocalDate.parse(dob), nationality);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        DigitalID identity = new DigitalID(id, name, gender, LocalDate.parse(dob, formatter), nationality);
         repository.save(identity);
         auditService.recordEvent("IDENTITY_CREATED", id, org, "SUCCESS");
         return identity;

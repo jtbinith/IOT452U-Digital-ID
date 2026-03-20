@@ -36,7 +36,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.digitalid.app.ConsoleApplication</mainClass>
+                            <mainClass>com.digitalid.app.TerminalApplication</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
