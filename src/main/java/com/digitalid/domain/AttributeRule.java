@@ -9,7 +9,8 @@ public class AttributeRule {
 
     private static final List<IdentityAttribute> IMMUTABLE = List.of(
         IdentityAttribute.ID,
-        IdentityAttribute.NAME,
+        IdentityAttribute.FIRST_NAME,
+        IdentityAttribute.SURNAME,
         IdentityAttribute.GENDER,
         IdentityAttribute.DATE_OF_BIRTH
     );

@@ -127,8 +127,10 @@ public class TerminalApplication {
 
     private void handleCreateIdentity() {
         System.out.println("\n--- Create New Identity ---\n");
-        System.out.print("Enter name: ");
-        String name = scanner.nextLine();
+        System.out.print("Enter first name: ");
+        String firstName = scanner.nextLine();
+        System.out.print("Enter surname: ");
+        String surname = scanner.nextLine();
         System.out.print("Enter gender (Male/Female/Other): ");
         String gender = scanner.nextLine();
         System.out.print("Enter date of birth (DD-MM-YYYY): ");
@@ -138,10 +140,10 @@ public class TerminalApplication {
 
         try {
             LocalDate.parse(dob, DATE_FORMAT);
-            DigitalID identity = identityService.createIdentity(name, gender, dob, nationality, currentOrganisation);
+            DigitalID identity = identityService.createIdentity(firstName, surname, gender, dob, nationality, currentOrganisation);
             System.out.println("\nSUCCESS: Identity created");
             System.out.println("  ID:          " + identity.getId());
-            System.out.println("  Name:        " + identity.getName());
+            System.out.println("  Name:        " + identity.getFullName());
             System.out.println("  Gender:      " + identity.getGender());
             System.out.println("  DOB:         " + identity.getDateOfBirth().format(DATE_FORMAT));
             System.out.println("  Nationality: " + identity.getNationality());
@@ -167,7 +169,7 @@ public class TerminalApplication {
                 DigitalID identity = identityService.findIdentity(id);
                 System.out.println("\nIdentity Details:");
                 System.out.println("  ID:          " + identity.getId());
-                System.out.println("  Name:        " + identity.getName());
+                System.out.println("  Name:        " + identity.getFullName());
                 System.out.println("  Gender:      " + identity.getGender());
                 System.out.println("  DOB:         " + identity.getDateOfBirth().format(DATE_FORMAT));
                 System.out.println("  Nationality: " + identity.getNationality());

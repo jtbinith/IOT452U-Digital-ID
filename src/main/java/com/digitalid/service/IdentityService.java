@@ -39,13 +39,13 @@ public class IdentityService {
         this.idGenerator = idGenerator;
     }
 
-    public DigitalID createIdentity(String name, String gender, String dob, String nationality, OrganisationType org) {
+    public DigitalID createIdentity(String firstName, String surname, String gender, String dob, String nationality, OrganisationType org) {
         if (!authService.canModifyIdentity(org)) {
             throw new UnauthorisedAccessException(org, "create identity");
         }
         String id = idGenerator.generateId();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        DigitalID identity = new DigitalID(id, name, gender, LocalDate.parse(dob, formatter), nationality);
+        DigitalID identity = new DigitalID(id, firstName, surname, gender, LocalDate.parse(dob, formatter), nationality);
         repository.save(identity);
         auditService.recordEvent("IDENTITY_CREATED", id, org, "SUCCESS");
         return identity;
@@ -123,7 +123,7 @@ public class IdentityService {
 
     public List<DigitalID> findIdentity(String name, LocalDate dob) {
         return repository.findAll().stream()
-            .filter(identity -> identity.getName().equalsIgnoreCase(name)
+            .filter(identity -> identity.getFullName().equalsIgnoreCase(name)
                     && identity.getDateOfBirth().equals(dob))
             .collect(Collectors.toList());
     }

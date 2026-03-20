@@ -4,7 +4,8 @@ package com.digitalid.domain;
 
 public enum IdentityAttribute {
     ID,
-    NAME,
+    FIRST_NAME,
+    SURNAME,
     GENDER,
     DATE_OF_BIRTH,
     NATIONALITY,

@@ -2,7 +2,7 @@ package com.digitalid.util;
 
 import java.util.Random;
 
-// format -> XX-000001-X — e.g. KR-000001-T, PL-000002-M
+// format -> XX-00-01-X — e.g. KR-00-01-T, PL-00-02-M
 
 public class IdGenerator {
 
@@ -14,7 +14,9 @@ public class IdGenerator {
         char prefix1 = randomLetter();
         char prefix2 = randomLetter();
         char suffix = randomLetter();
-        return String.format("%c%c-%06d-%c", prefix1, prefix2, counter, suffix);
+        String digits = String.format("%04d", counter);
+        return String.format("%c%c-%s-%s-%c", prefix1, prefix2,
+            digits.substring(0, 2), digits.substring(2, 4), suffix);
     }
 
     private char randomLetter() {

@@ -6,7 +6,8 @@ import com.digitalid.exception.InvalidStatusTransitionException;
 
 public class DigitalID {
     private final String id;
-    private final String name;
+    private final String firstName;
+    private final String surname;
     private final String gender;
     private final LocalDate dateOfBirth;
     private String nationality;
@@ -15,9 +16,10 @@ public class DigitalID {
     private boolean restricted;
     private final LocalDate createdDate;
 
-    public DigitalID(String id, String name, String gender, LocalDate dateOfBirth, String nationality) {
+    public DigitalID(String id, String firstName, String surname, String gender, LocalDate dateOfBirth, String nationality) {
         this.id = id;
-        this.name = name;
+        this.firstName = firstName;
+        this.surname = surname;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.nationality = nationality;
@@ -78,7 +80,9 @@ public class DigitalID {
 
     // getters
     public String getId() { return id; }
-    public String getName() { return name; }
+    public String getFirstName() { return firstName; }
+    public String getSurname() { return surname; }
+    public String getFullName() { return firstName + " " + surname; }
     public String getGender() { return gender; }
     public LocalDate getDateOfBirth() { return dateOfBirth; }
     public String getNationality() { return nationality; }
