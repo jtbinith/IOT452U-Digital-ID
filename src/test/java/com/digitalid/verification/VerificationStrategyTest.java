@@ -1,0 +1,78 @@
+package com.digitalid.verification;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.time.LocalDate;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import com.digitalid.domain.DigitalID;
+
+class VerificationStrategyTest {
+
+    private DigitalID identity;
+
+    @BeforeEach
+    void setUp() {
+        identity = new DigitalID("AB-00-01-C", "Jane", "Smith", "Female",
+                LocalDate.of(1995, 6, 15), "British", "10 High Street", "E1 7AA");
+    }
+
+    @Test
+    void employerShouldReturnValidForActiveIdentity() {
+        VerificationResult result = new EmployerVerificationStrategy().verify(identity);
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    void employerShouldReturnInvalidForSuspendedIdentity() {
+        identity.suspend();
+        VerificationResult result = new EmployerVerificationStrategy().verify(identity);
+        assertFalse(result.isValid());
+    }
+    
+    @Test
+    void bankShouldReturnValidForActiveIdentity() {
+        VerificationResult result = new BankVerificationStrategy().verify(identity);
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    void bankShouldReturnInvalidForRevokedIdentity() {
+        identity.revoke();
+        VerificationResult result = new BankVerificationStrategy().verify(identity);
+        assertFalse(result.isValid());
+    }
+
+    @Test
+    void taxAuthorityShouldReturnValidForActiveIdentity() {
+        VerificationResult result = new TaxAuthorityVerificationStrategy().verify(identity);
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    void taxAuthorityShouldReturnSuspensionMessageForSuspendedIdentity() {
+        identity.suspend();
+        VerificationResult result = new TaxAuthorityVerificationStrategy().verify(identity);
+        assertFalse(result.isValid());
+        assertTrue(result.getReason().toLowerCase().contains("suspended"));
+    }
+
+    @Test
+    void drivingAuthorityShouldReturnValidForActiveUnrestrictedIdentity() {
+        VerificationResult result = new DrivingAuthorityVerificationStrategy().verify(identity);
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    void drivingAuthorityShouldReturnInvalidForRestrictedIdentity() {
+        identity.setRestriction(true);
+        VerificationResult result = new DrivingAuthorityVerificationStrategy().verify(identity);
+        assertFalse(result.isValid());
+        assertTrue(result.getReason().toLowerCase().contains("restriction"));
+    }
+
+}
+

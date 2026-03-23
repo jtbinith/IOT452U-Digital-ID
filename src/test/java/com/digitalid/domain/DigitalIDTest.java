@@ -105,4 +105,16 @@ class DigitalIDTest {
         identity.setRestriction(false);
         assertFalse(identity.isRestricted());
     }
+
+    @Test
+    void shouldUpdatePostcodeWhenActive() {
+        identity.updatePostcode("CB1 8GB");
+        assertEquals("CB1 8GB", identity.getPostcode());
+    }
+
+    @Test
+    void shouldNotUpdatePostcodeWhenRevoked() {
+        identity.revoke();
+        assertThrows(IllegalStateException.class, () -> identity.updatePostcode("CB1 8GB"));
+    }
 }
