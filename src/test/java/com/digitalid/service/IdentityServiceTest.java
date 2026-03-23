@@ -18,12 +18,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class IdentityServiceTest {
 
     private IdentityService service;
+    private AuditService auditService;
 
     @BeforeEach
     void setUp() {
+        auditService = new AuditService();
         service = new IdentityService(
                 new InMemoryIdentityRepository(),
-                new AuditService(),
+                auditService,
                 new AuthorisationService(),
                 new StatusTransitionValidator(),
                 new AttributeRule(),
@@ -104,5 +106,41 @@ class IdentityServiceTest {
 
         service.revokeIdentity(identity.getId(), OrganisationType.CENTRAL_AUTHORITY);
         assertTrue(service.findIdentity(identity.getId()).isRevoked());
+    }
+
+    @Test
+    void consumingOrgShouldNotSuspendIdentity() {
+        DigitalID identity = service.createIdentity("Jane", "Smith", "Female", "15-06-1995", "British", "", "", OrganisationType.CENTRAL_AUTHORITY);
+
+        assertThrows(UnauthorisedAccessException.class,
+                () -> service.suspendIdentity(identity.getId(), OrganisationType.EMPLOYER));
+    }
+
+    @Test
+    void consumingOrgShouldNotRevokeIdentity() {
+        DigitalID identity = service.createIdentity("Jane", "Smith", "Female", "15-06-1995", "British", "", "", OrganisationType.CENTRAL_AUTHORITY);
+
+        assertThrows(UnauthorisedAccessException.class,
+                () -> service.revokeIdentity(identity.getId(), OrganisationType.EMPLOYER));
+    }
+
+    @Test
+    void shouldSetAndRemoveRestrictionThroughService() {
+        DigitalID identity = service.createIdentity("Jane", "Smith", "Female", "15-06-1995", "British", "", "", OrganisationType.CENTRAL_AUTHORITY);
+
+        String id = identity.getId();
+        service.setRestriction(id, true, OrganisationType.CENTRAL_AUTHORITY);
+        assertTrue(service.findIdentity(id).isRestricted());
+
+        service.setRestriction(id, false, OrganisationType.CENTRAL_AUTHORITY);
+        assertFalse(service.findIdentity(id).isRestricted());
+
+    }
+
+    @Test
+    void shouldRecordAuditEventWhenIdentityCreated() {
+        service.createIdentity("Jane", "Smith", "Female", "15-06-1995", "British", "", "", OrganisationType.CENTRAL_AUTHORITY);
+
+        assertFalse(auditService.getAuditLogs().isEmpty());
     }
 }
