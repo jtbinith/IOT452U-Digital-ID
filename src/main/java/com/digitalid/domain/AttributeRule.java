@@ -26,7 +26,6 @@ public class AttributeRule {
     }
 
     public List<IdentityAttribute> getMutableAttributes() {
-        return List.of(IdentityAttribute.NATIONALITY, IdentityAttribute.ADDRESS);
+        return List.of(IdentityAttribute.NATIONALITY, IdentityAttribute.ADDRESS, IdentityAttribute.POSTCODE);
     }
 }
-
