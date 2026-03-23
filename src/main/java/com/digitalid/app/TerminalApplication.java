@@ -331,6 +331,7 @@ public class TerminalApplication {
                 System.out.println("  Status:      " + identity.getStatus());
                 System.out.println("  Restricted:  " + (identity.isRestricted() ? "Yes" : "No"));
                 System.out.println("  Created:     " + identity.getCreatedDate().format(DATE_FORMAT));
+                auditService.recordEvent("VERIFICATION_REQUESTED", id, currentOrganisation, "FULL_DETAILS_VIEWED");
             } else {
                 com.digitalid.verification.VerificationResult result =
                     verificationService.verifyIdentity(id, currentOrganisation);
