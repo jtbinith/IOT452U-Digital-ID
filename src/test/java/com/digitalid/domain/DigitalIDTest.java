@@ -66,7 +66,24 @@ class DigitalIDTest {
     @Test
     void shouldNotUpdateNationalityWhenRevoked() {
         identity.revoke();
-        assertThrows(InvalidStatusTransitionException.class, () -> identity.updateNationality("French"));
+        assertThrows(IllegalStateException.class, () -> identity.updateNationality("French"));
+    }
+
+    @Test
+    void shouldNotUpdateAddressWhenRevoked() {
+        identity.revoke();
+        assertThrows(IllegalStateException.class, () -> identity.updateAddress("86 New Road"));
+    }
+
+    @Test
+    void shouldNotSetRestrictionWhenRevoked() {
+        identity.revoke();
+        assertThrows(IllegalStateException.class, () -> identity.setRestriction(true));
+    }
+
+    @Test
+    void newIdentityShouldNotBeRestricted() {
+        assertFalse(identity.isRestricted());
     }
 
     @Test
