@@ -91,10 +91,11 @@ public class IdentityService {
             throw new UnauthorisedAccessException(org, "change identity status");
         }
         DigitalID identity = findIdentityOrThrow(id);
-        transitionValidator.validate(id, identity.getStatus(), IdentityStatus.SUSPENDED);
+        IdentityStatus previousStatus = identity.getStatus();
+        transitionValidator.validate(id, previousStatus, IdentityStatus.SUSPENDED);
         identity.suspend();
         repository.save(identity);
-        auditService.recordEvent("STATUS_CHANGED", id, org, "ACTIVE → SUSPENDED");
+        auditService.recordEvent("STATUS_CHANGED", id, org, previousStatus + " -> SUSPENDED");
     }
 
     public void activateIdentity(String id, OrganisationType org) {
@@ -102,10 +103,11 @@ public class IdentityService {
             throw new UnauthorisedAccessException(org, "change identity status");
         }
         DigitalID identity = findIdentityOrThrow(id);
-        transitionValidator.validate(id, identity.getStatus(), IdentityStatus.ACTIVE);
+        IdentityStatus previousStatus = identity.getStatus();
+        transitionValidator.validate(id, previousStatus, IdentityStatus.ACTIVE);
         identity.activate();
         repository.save(identity);
-        auditService.recordEvent("STATUS_CHANGED", id, org, "SUSPENDED → ACTIVE");
+        auditService.recordEvent("STATUS_CHANGED", id, org, previousStatus + " -> ACTIVE");
     }
 
     public void revokeIdentity(String id, OrganisationType org) {
@@ -113,10 +115,11 @@ public class IdentityService {
             throw new UnauthorisedAccessException(org, "change identity status");
         }
         DigitalID identity = findIdentityOrThrow(id);
-        transitionValidator.validate(id, identity.getStatus(), IdentityStatus.REVOKED);
+        IdentityStatus previousStatus = identity.getStatus();
+        transitionValidator.validate(id, previousStatus, IdentityStatus.REVOKED);
         identity.revoke();
         repository.save(identity);
-        auditService.recordEvent("STATUS_CHANGED", id, org, identity.getStatus() + " → REVOKED");
+        auditService.recordEvent("STATUS_CHANGED", id, org, previousStatus + " -> REVOKED");
     }
 
     public void setRestriction(String id, boolean restricted, OrganisationType org) {
