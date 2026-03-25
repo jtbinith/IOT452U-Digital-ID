@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
+import com.digitalid.audit.AuditLogEntry;
 import com.digitalid.audit.AuditService;
 import com.digitalid.domain.AttributeRule;
 import com.digitalid.domain.DigitalID;
@@ -92,9 +93,12 @@ public class TerminalApplication {
         System.out.println("  1. Create Identity");
         System.out.println("  2. Update Identity");
         System.out.println("  3. Change Status");
-        System.out.println("  4. Verify Identity");
-        System.out.println("  5. Switch Organisation");
-        System.out.println("  6. Exit");
+        System.out.println("  4. Set/Remove Restriction");
+        System.out.println("  5. Verify Identity");
+        System.out.println("  6. Find Identity");
+        System.out.println("  7. View Audit Logs");
+        System.out.println("  8. Switch Organisation");
+        System.out.println("  9. Exit");
         System.out.print("\nChoice: ");
 
         int choice = readInt();
@@ -102,9 +106,12 @@ public class TerminalApplication {
             case 1 -> handleCreateIdentity();
             case 2 -> handleUpdateIdentity();
             case 3 -> handleChangeStatus();
-            case 4 -> handleVerifyIdentity();
-            case 5 -> selectOrganisation();
-            case 6 -> { return false; }
+            case 4 -> handleSetRestriction();
+            case 5 -> handleVerifyIdentity();
+            case 6 -> handleFindIdentity();
+            case 7 -> handleViewAuditLogs();
+            case 8 -> selectOrganisation();
+            case 9 -> { return false; }
             default -> System.out.println("Invalid choice.");
         }
         return true;
@@ -312,6 +319,33 @@ public class TerminalApplication {
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
     }
+
+    private void handleSetRestriction() {
+        System.out.println("\n--- Set Identity Restriction ---\n");
+        System.out.print("Enter Digital ID: ");
+        String id = scanner.nextLine().trim();
+
+        try {
+            DigitalID identity = identityService.findIdentity(id);
+            System.out.println("Current restriction status: " + (identity.isRestricted() ? "RESTRICTED" : "NONE"));
+            System.out.print("Apply Restriction? (Y)es/(N)o: ");
+            String input = scanner.nextLine().trim().toLowerCase();
+            boolean restricted = input.equals("yes") || input.equals("y");
+
+            if (restricted == identity.isRestricted()) {
+                System.out.println("\nNo change - restriction is already " + (restricted ? "applied." : "removed."));
+            } else {
+                identityService.setRestriction(id, restricted, currentOrganisation);
+                System.out.println(restricted ? "\nRestriction applied." : "\nRestriction removed.");
+            }
+        } catch (Exception e) {
+            System.out.println("\nERROR: " + e.getMessage());
+        }
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
     private void handleVerifyIdentity() {
         System.out.println("\n--- Verify Identity ---\n");
         System.out.print("Enter Digital ID: ");
@@ -341,6 +375,53 @@ public class TerminalApplication {
             }
         } catch (Exception e) {
             System.out.println("\nERROR: " + e.getMessage());
+        }
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    private void handleFindIdentity() {
+        System.out.println("\n--- Find Identity ---\n");
+        System.out.print("Enter full name: ");
+        String name = scanner.nextLine().trim();
+        System.out.print("Enter date of birth (dd-MM-yyyy): ");
+        String dobInput = scanner.nextLine().trim();
+
+        try {
+            LocalDate dob = LocalDate.parse(dobInput, DATE_FORMAT);
+            java.util.List<DigitalID> results = identityService.findIdentity(name, dob);
+
+            if (results.isEmpty()) {
+                System.out.println("\nNo identities found.");
+            } else {
+                System.out.println("\nFound " + results.size() + " result(s):");
+                for (DigitalID identity : results) {
+                    System.out.println("  ID: " + identity.getId() + " | Name: " + identity.getFullName() + " | Status: " + identity.getStatus());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("\nERROR: " + e.getMessage());
+        }
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    private void handleViewAuditLogs() {
+        System.out.println("\n--- Audit Log ---\n");
+
+        java.util.List<AuditLogEntry> logs = auditService.getAuditLogs();
+
+        if (logs.isEmpty()) {
+            System.out.println("No audit events recorded.");
+        } else {
+            for (AuditLogEntry entry : logs) {
+                System.out.println("  [" + entry.getTimestamp().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) + "] "
+                        + entry.getOperation() + " | ID: " + entry.getIdentityId()
+                        + " | Org: " + entry.getOrganisation() + " | " + entry.getResult());
+            }
+            System.out.println("\nTotal events: " + logs.size());
         }
 
         System.out.println("\nPress Enter to continue...");
