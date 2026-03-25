@@ -143,4 +143,12 @@ class IdentityServiceTest {
 
         assertFalse(auditService.getAuditLogs().isEmpty());
     }
+
+    @Test
+    void shouldFindIdentityByNameAndDOB() {
+        service.createIdentity("Jane", "Smith", "Female", "15-06-1995", "British", "", "", OrganisationType.CENTRAL_AUTHORITY);
+        java.util.List<DigitalID> results = service.findIdentity("Jane Smith", java.time.LocalDate.of(1995, 6, 15));
+        assertFalse(results.isEmpty());
+        assertEquals("Jane Smith", results.get(0).getFullName());
+    }
 }
