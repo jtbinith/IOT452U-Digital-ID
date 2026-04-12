@@ -117,6 +117,12 @@ public class DigitalID {
                         && !change.getTimestamp().toLocalDate().isAfter(to));
     }
 
+    public long getSuspensionCount() {
+        return statusHistory.stream()
+                .filter(change -> change.getToStatus() == IdentityStatus.SUSPENDED)
+                .count();
+    }
+
     public static class StatusChange {
         private final IdentityStatus fromStatus;
         private final IdentityStatus toStatus;

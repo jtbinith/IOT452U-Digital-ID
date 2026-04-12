@@ -75,6 +75,7 @@ public class TerminalApplication {
         System.out.println("  3. Driving Authority");
         System.out.println("  4. Bank");
         System.out.println("  5. Employer");
+        System.out.println("  6. Welfare Authority");
         System.out.print("\nChoice: ");
 
         int choice = readInt();
@@ -84,6 +85,7 @@ public class TerminalApplication {
             case 3 -> currentOrganisation = OrganisationType.DRIVING_AUTHORITY;
             case 4 -> currentOrganisation = OrganisationType.BANK;
             case 5 -> currentOrganisation = OrganisationType.EMPLOYER;
+            case 6 -> currentOrganisation = OrganisationType.WELFARE_AUTHORITY;
             default -> {
                 System.out.println("Invalid choice. Defaulting to Employer.");
                 currentOrganisation = OrganisationType.EMPLOYER;

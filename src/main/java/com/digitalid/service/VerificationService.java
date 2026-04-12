@@ -25,6 +25,7 @@ public class VerificationService {
         strategies.put(OrganisationType.BANK, new BankVerificationStrategy());
         strategies.put(OrganisationType.TAX_AUTHORITY, new TaxAuthorityVerificationStrategy());
         strategies.put(OrganisationType.DRIVING_AUTHORITY, new DrivingAuthorityVerificationStrategy());
+        strategies.put(OrganisationType.WELFARE_AUTHORITY, new WelfareAuthorityVerificationStrategy());
     }
 
     public VerificationResult verifyIdentity(String id, OrganisationType org) {

@@ -9,5 +9,6 @@ public enum OrganisationType {
     TAX_AUTHORITY,
     DRIVING_AUTHORITY,
     BANK,
-    EMPLOYER
+    EMPLOYER,
+    WELFARE_AUTHORITY
 }
