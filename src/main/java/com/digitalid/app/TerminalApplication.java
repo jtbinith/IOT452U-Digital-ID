@@ -44,7 +44,11 @@ public class TerminalApplication {
         this.scanner = new Scanner(System.in);
     }
 
-    public void start() {
+    public void start(boolean demoMode) {
+        if (demoMode) {
+            loadSampleData();
+            System.out.println("  [Demo mode: sample identities loaded]\n");
+        }
         System.out.println("========================================");
         System.out.println("        Digital ID Platform");
         System.out.println("========================================");
@@ -513,7 +517,7 @@ public class TerminalApplication {
         } else {
             System.out.println("Registered identities:");
             for (DigitalID id : identities) {
-                System.out.println("  " + id.getId() + " | " + id.getFullName() + " | " + id.getStatus());
+                System.out.println("  " + id.getId() + " | " + id.getFullName() + " | " + id.getStatus() + (id.isRestricted() ? " | RESTRICTED" : ""));
             }
             System.out.println();
         }
@@ -602,8 +606,26 @@ public class TerminalApplication {
         return result.toString().trim();
     }
 
+    private void loadSampleData() {
+        OrganisationType ca = OrganisationType.CENTRAL_AUTHORITY;
+        identityService.createIdentity("Sarah", "George", "Female", "15-03-1992", "British", "42 Park Lane", "SW1A 2AA", ca);
+        DigitalID james = identityService.createIdentity("James", "O'Brien", "Male", "28-11-1985", "Irish", "7 Queen Street", "E1 6AN", ca);
+        DigitalID aisha = identityService.createIdentity("Aisha", "Rajan", "Female", "03-07-2001", "British", "15 Mill Road", "CB1 3AB", ca);
+        DigitalID tom = identityService.createIdentity("Tom", "Williams", "Male", "12-01-1978", "British", "", "", ca);
+        identityService.createIdentity("Alex", "Hollow-Bales", "Other", "22-09-1995", "Spanish", "8 High Street", "N1 9GU", ca);
+
+        // James — suspend then reactivate (creates suspension history)
+        identityService.suspendIdentity(james.getId(), ca);
+        identityService.activateIdentity(james.getId(), ca);
+        // Aisha — set restriction
+        identityService.setRestriction(aisha.getId(), true, ca);
+        // Tom — revoke
+        identityService.revokeIdentity(tom.getId(), ca);
+    }
+
     public static void main(String[] args) {
         TerminalApplication app = new TerminalApplication();
-        app.start();
+        boolean demoMode = args.length > 0 && args[0].equals("--demo");
+        app.start(demoMode);
     }
 }

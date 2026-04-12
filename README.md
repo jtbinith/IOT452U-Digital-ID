@@ -20,6 +20,19 @@ Build and run the application:
 mvn compile -q && java -cp target/classes com.digitalid.app.TerminalApplication
 ```
 
+Run with pre-loaded sample identities:
+
+```bash
+mvn compile -q && java -cp target/classes com.digitalid.app.TerminalApplication --demo
+```
+
+Demo mode loads five identities in different states:
+- Sarah George - ACTIVE
+- James O'Brien - ACTIVE (was previously suspended - has suspension history)
+- Aisha Rajan - ACTIVE, RESTRICTED
+- Tom Williams - REVOKED
+- Alex Hollow-Bales - ACTIVE
+
 Run all tests:
 
 ```bash
