@@ -1,6 +1,9 @@
 package com.digitalid.domain;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.digitalid.exception.InvalidStatusTransitionException;
 
@@ -16,6 +19,7 @@ public class DigitalID {
     private IdentityStatus status;
     private boolean restricted;
     private final LocalDate createdDate;
+    private final List<StatusChange> statusHistory;
 
     public DigitalID(String id, String firstName, String surname, String gender, LocalDate dateOfBirth,
                      String nationality, String address, String postcode) {
@@ -30,6 +34,7 @@ public class DigitalID {
         this.status = IdentityStatus.ACTIVE;
         this.restricted = false;
         this.createdDate = LocalDate.now();
+        this.statusHistory = new ArrayList<>();
     }
 
     // lifecycle methods
@@ -38,7 +43,7 @@ public class DigitalID {
         if (this.status == IdentityStatus.REVOKED) {
             throw new InvalidStatusTransitionException(this.id, this.status, IdentityStatus.ACTIVE);
         }
-
+        statusHistory.add(new StatusChange(this.status, IdentityStatus.ACTIVE));
         this.status = IdentityStatus.ACTIVE;
     }
 
@@ -46,10 +51,12 @@ public class DigitalID {
         if (this.status == IdentityStatus.REVOKED) {
             throw new InvalidStatusTransitionException(this.id, this.status, IdentityStatus.SUSPENDED);
         }
+        statusHistory.add(new StatusChange(this.status, IdentityStatus.SUSPENDED));
         this.status = IdentityStatus.SUSPENDED;
     }
 
     public void revoke() {
+        statusHistory.add(new StatusChange(this.status, IdentityStatus.REVOKED));
         this.status = IdentityStatus.REVOKED;
     }
 
@@ -100,4 +107,31 @@ public class DigitalID {
     public String getPostcode() { return postcode; }
     public IdentityStatus getStatus() { return status; }
     public LocalDate getCreatedDate() { return createdDate; }
+
+    public List<StatusChange> getStatusHistory() {
+        return new ArrayList<>(statusHistory);
+    }
+
+    public boolean wasSuspendedBetween(LocalDate from, LocalDate to) {
+        return statusHistory.stream()
+                .anyMatch(change -> change.getToStatus() == IdentityStatus.SUSPENDED
+                        && !change.getTimestamp().toLocalDate().isBefore(from)
+                        && !change.getTimestamp().toLocalDate().isAfter(to));
+    }
+
+    public static class StatusChange {
+        private final IdentityStatus fromStatus;
+        private final IdentityStatus toStatus;
+        private final LocalDateTime timestamp;
+
+        public StatusChange(IdentityStatus fromStatus, IdentityStatus toStatus) {
+            this.fromStatus = fromStatus;
+            this.toStatus = toStatus;
+            this.timestamp = LocalDateTime.now();
+        }
+
+        public IdentityStatus getFromStatus() { return fromStatus; }
+        public IdentityStatus getToStatus() { return toStatus; }
+        public LocalDateTime getTimestamp() { return timestamp; }
+    }
 }

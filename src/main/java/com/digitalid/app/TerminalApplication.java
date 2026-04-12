@@ -144,6 +144,7 @@ public class TerminalApplication {
         String gender = readValidGender("Enter gender (M)ale / (F)emale / (X) Other: ");
         String dob = readValidDob("Enter date of birth (DD-MM-YYYY): ");
         String nationality = readNonEmpty("Enter nationality (e.g. British, Irish, French): ");
+        nationality = nationality.substring(0, 1).toUpperCase() + nationality.substring(1).toLowerCase();
         System.out.print("Enter address (or press Enter to skip): ");
         String address = scanner.nextLine().trim();
         String postcode = "";
@@ -196,7 +197,10 @@ public class TerminalApplication {
                         case 2 -> surname = readName("Enter surname: ");
                         case 3 -> gender = readValidGender("Enter gender (M)ale / (F)emale / (X) Other: ");
                         case 4 -> dob = readValidDob("Enter date of birth (DD-MM-YYYY): ");
-                        case 5 -> nationality = readNonEmpty("Enter nationality (e.g. British, Irish, French): ");
+                        case 5 -> {
+                            nationality = readNonEmpty("Enter nationality (e.g. British, Irish, French): ");
+                            nationality = nationality.substring(0, 1).toUpperCase() + nationality.substring(1).toLowerCase();
+                        }
                         case 6 -> {
                             System.out.print("Enter address (or press Enter to clear): ");
                             address = scanner.nextLine().trim();
@@ -253,6 +257,7 @@ public class TerminalApplication {
             switch (field) {
                 case 1 -> {
                     String nationality = readNonEmpty("Enter new nationality: ");
+                    nationality = nationality.substring(0, 1).toUpperCase() + nationality.substring(1).toLowerCase();
                     identityService.updateNationality(id, nationality, currentOrganisation);
                     System.out.println("\nSUCCESS: Nationality updated to '" + nationality + "'");
                 }
@@ -378,8 +383,43 @@ public class TerminalApplication {
                 System.out.println("  Created:     " + identity.getCreatedDate().format(DATE_FORMAT));
                 auditService.recordEvent("VERIFICATION_REQUESTED", id, currentOrganisation, "FULL_DETAILS_VIEWED");
             } else {
-                com.digitalid.verification.VerificationResult result =
-                    verificationService.verifyIdentity(id, currentOrganisation);
+                com.digitalid.verification.VerificationResult result;
+                if (currentOrganisation == OrganisationType.TAX_AUTHORITY) {
+                    System.out.println("Select reporting period:");
+                    System.out.println("  1. Last 30 days");
+                    System.out.println("  2. Last quarter");
+                    System.out.println("  3. Last year");
+                    System.out.println("  4. Custom range");
+                    System.out.print("\nChoice: ");
+                    int periodChoice = readInt();
+
+                    LocalDate from;
+                    LocalDate to = LocalDate.now();
+                    switch (periodChoice) {
+                        case 1 -> from = to.minusDays(30);
+                        case 2 -> from = to.minusMonths(3);
+                        case 3 -> from = to.minusYears(1);
+                        case 4 -> {
+                            String fromDate = readValidDob("Enter start date (dd-MM-yyyy): ");
+                            from = LocalDate.parse(fromDate, DATE_FORMAT);
+                            String toDate = readValidDob("Enter end date (dd-MM-yyyy): ");
+                            to = LocalDate.parse(toDate, DATE_FORMAT);
+                            while (!to.isAfter(from)) {
+                                System.out.println("ERROR: End date must be after start date.");
+                                toDate = readValidDob("Enter end date (dd-MM-yyyy): ");
+                                to = LocalDate.parse(toDate, DATE_FORMAT);
+                            }
+                        }
+                        default -> {
+                            System.out.println("Invalid choice. Using last 30 days.");
+                            from = to.minusDays(30);
+                        }
+                    }
+                    System.out.println("\nChecking period: " + from.format(DATE_FORMAT) + " to " + to.format(DATE_FORMAT));
+                    result = verificationService.verifyIdentityWithPeriod(id, currentOrganisation, from, to);
+                } else {
+                    result = verificationService.verifyIdentity(id, currentOrganisation);
+                }
                 System.out.println("\nVerifying as: " + formatOrgName(currentOrganisation));
                 System.out.println("Result: " + (result.isValid() ? "VALID" : "INVALID"));
                 System.out.println("Reason: " + result.getReason());

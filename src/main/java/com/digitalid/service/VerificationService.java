@@ -1,5 +1,6 @@
 package com.digitalid.service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import com.digitalid.domain.DigitalID;
@@ -33,6 +34,21 @@ public class VerificationService {
 
         VerificationStrategy strategy = strategies.get(org);
         VerificationResult result = strategy.verify(identity);
+
+        auditService.recordEvent("VERIFICATION_REQUESTED", id, org,
+            result.isValid() ? "VALID" : "INVALID - " + result.getReason());
+
+        return result;
+    }
+
+    public VerificationResult verifyIdentityWithPeriod(String id, OrganisationType org, LocalDate from, LocalDate to) {
+        DigitalID identity = repository.findById(id);
+        if (identity == null) {
+            throw new IdentityNotFoundException(id);
+        }
+
+        TaxAuthorityVerificationStrategy strategy = (TaxAuthorityVerificationStrategy) strategies.get(org);
+        VerificationResult result = strategy.verify(identity, from, to);
 
         auditService.recordEvent("VERIFICATION_REQUESTED", id, org,
             result.isValid() ? "VALID" : "INVALID - " + result.getReason());
