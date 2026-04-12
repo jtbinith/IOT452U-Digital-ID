@@ -171,6 +171,22 @@ public class TerminalApplication {
                         System.out.println("ERROR: Postcode is required when an address is provided. Please edit field 7.");
                         continue;
                     }
+                    List<DigitalID> duplicates = identityService.findIdentity(
+                            firstName + " " + surname, LocalDate.parse(dob, DATE_FORMAT));
+                    if (!duplicates.isEmpty()) {
+                        System.out.println("\nWARNING: An identity with this name and date of birth already exists:");
+                        for (DigitalID dup : duplicates) {
+                            System.out.println("  " + dup.getId() + " | " + dup.getFullName() + " | " + dup.getStatus());
+                        }
+                        System.out.print("Proceed with creation? (Y/N): ");
+                        String confirm = scanner.nextLine().trim().toUpperCase();
+                        if (!confirm.equals("Y") && !confirm.equals("YES")) {
+                            System.out.println("\nIdentity creation cancelled.");
+                            System.out.println("\nPress Enter to continue...");
+                            scanner.nextLine();
+                            return;
+                        }
+                    }
                     try {
                         DigitalID identity = identityService.createIdentity(firstName, surname, gender, dob, nationality, address, postcode, currentOrganisation);
                         System.out.println("\nSUCCESS: Identity created");
