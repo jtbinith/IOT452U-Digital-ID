@@ -139,6 +139,9 @@ classDiagram
     class DrivingAuthorityVerificationStrategy {
         +verify(DigitalID) VerificationResult
     }
+    class WelfareAuthorityVerificationStrategy {
+        +verify(DigitalID) VerificationResult
+    }
     class VerificationService {
         -strategies: Map
         +verifyIdentity(id, org) VerificationResult
@@ -155,6 +158,7 @@ classDiagram
     VerificationStrategy <|.. BankVerificationStrategy
     VerificationStrategy <|.. TaxAuthorityVerificationStrategy
     VerificationStrategy <|.. DrivingAuthorityVerificationStrategy
+    VerificationStrategy <|.. WelfareAuthorityVerificationStrategy
     VerificationService --> VerificationStrategy
     VerificationStrategy ..> VerificationResult
 ```
@@ -162,6 +166,7 @@ classDiagram
 - **Employer & Bank** - check if the identity is currently active.
 - **Tax Authority** - checks active status and whether the identity was suspended during a given reporting period.
 - **Driving Authority** - checks active status and whether the identity is subject to a restriction.
+- **Welfare Authority** - checks active status and whether the identity has exceeded the maximum number of suspensions.
 
 ### Exception Hierarchy
 
@@ -221,7 +226,7 @@ The Welfare Authority was added this way after the core system was complete, dem
 
 ## Testing
 
-52 JUnit 5 tests across 5 test files:
+57 JUnit 5 tests across 5 test files:
 
 - **DigitalIDTest** - identity lifecycle, attribute updates, revoked state enforcement, status history
 - **StatusTransitionValidatorTest** - valid and invalid state transitions
