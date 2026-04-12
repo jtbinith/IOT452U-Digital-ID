@@ -6,6 +6,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
+import com.digitalid.audit.AuditEventType;
 import com.digitalid.audit.AuditLogEntry;
 import com.digitalid.audit.AuditService;
 import com.digitalid.domain.AttributeRule;
@@ -381,7 +382,7 @@ public class TerminalApplication {
                 System.out.println("  Status:      " + identity.getStatus());
                 System.out.println("  Restricted:  " + (identity.isRestricted() ? "Yes" : "No"));
                 System.out.println("  Created:     " + identity.getCreatedDate().format(DATE_FORMAT));
-                auditService.recordEvent("VERIFICATION_REQUESTED", id, currentOrganisation, "FULL_DETAILS_VIEWED");
+                auditService.recordEvent(AuditEventType.VERIFICATION_REQUESTED, id, currentOrganisation, "FULL_DETAILS_VIEWED");
             } else {
                 com.digitalid.verification.VerificationResult result;
                 if (currentOrganisation == OrganisationType.TAX_AUTHORITY) {

@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.digitalid.audit.AuditEventType;
 import com.digitalid.audit.AuditService;
 import com.digitalid.domain.AttributeRule;
 import com.digitalid.domain.DigitalID;
@@ -49,7 +50,7 @@ public class IdentityService {
         DigitalID identity = new DigitalID(id, firstName, surname, gender, LocalDate.parse(dob, formatter),
                                            nationality, address, postcode);
         repository.save(identity);
-        auditService.recordEvent("IDENTITY_CREATED", id, org, "SUCCESS");
+        auditService.recordEvent(AuditEventType.IDENTITY_CREATED, id, org, "SUCCESS");
         return identity;
     }
 
@@ -61,7 +62,7 @@ public class IdentityService {
         DigitalID identity = findIdentityOrThrow(id);
         identity.updateNationality(nationality);
         repository.save(identity);
-        auditService.recordEvent("IDENTITY_UPDATED", id, org, "NATIONALITY changed to " + nationality);
+        auditService.recordEvent(AuditEventType.IDENTITY_UPDATED, id, org, "NATIONALITY changed to " + nationality);
     }
 
     public void updateAddress(String id, String address, OrganisationType org) {
@@ -72,7 +73,7 @@ public class IdentityService {
         DigitalID identity = findIdentityOrThrow(id);
         identity.updateAddress(address);
         repository.save(identity);
-        auditService.recordEvent("IDENTITY_UPDATED", id, org, "ADDRESS changed to " + address);
+        auditService.recordEvent(AuditEventType.IDENTITY_UPDATED, id, org, "ADDRESS changed to " + address);
     }
 
     public void updatePostcode(String id, String postcode, OrganisationType org) {
@@ -83,7 +84,7 @@ public class IdentityService {
         DigitalID identity = findIdentityOrThrow(id);
         identity.updatePostcode(postcode);
         repository.save(identity);
-        auditService.recordEvent("IDENTITY_UPDATED", id, org, "POSTCODE changed to " + postcode);
+        auditService.recordEvent(AuditEventType.IDENTITY_UPDATED, id, org, "POSTCODE changed to " + postcode);
     }
 
     public void suspendIdentity(String id, OrganisationType org) {
@@ -95,7 +96,7 @@ public class IdentityService {
         transitionValidator.validate(id, previousStatus, IdentityStatus.SUSPENDED);
         identity.suspend();
         repository.save(identity);
-        auditService.recordEvent("STATUS_CHANGED", id, org, previousStatus + " -> SUSPENDED");
+        auditService.recordEvent(AuditEventType.STATUS_CHANGED, id, org, previousStatus + " -> SUSPENDED");
     }
 
     public void activateIdentity(String id, OrganisationType org) {
@@ -107,7 +108,7 @@ public class IdentityService {
         transitionValidator.validate(id, previousStatus, IdentityStatus.ACTIVE);
         identity.activate();
         repository.save(identity);
-        auditService.recordEvent("STATUS_CHANGED", id, org, previousStatus + " -> ACTIVE");
+        auditService.recordEvent(AuditEventType.STATUS_CHANGED, id, org, previousStatus + " -> ACTIVE");
     }
 
     public void revokeIdentity(String id, OrganisationType org) {
@@ -119,7 +120,7 @@ public class IdentityService {
         transitionValidator.validate(id, previousStatus, IdentityStatus.REVOKED);
         identity.revoke();
         repository.save(identity);
-        auditService.recordEvent("STATUS_CHANGED", id, org, previousStatus + " -> REVOKED");
+        auditService.recordEvent(AuditEventType.STATUS_CHANGED, id, org, previousStatus + " -> REVOKED");
     }
 
     public void setRestriction(String id, boolean restricted, OrganisationType org) {
@@ -130,7 +131,7 @@ public class IdentityService {
         identity.setRestriction(restricted);
         repository.save(identity);
         String action = restricted ? "RESTRICTION APPLIED" : "RESTRICTION REMOVED";
-        auditService.recordEvent("IDENTITY_UPDATED", id, org, action);
+        auditService.recordEvent(AuditEventType.IDENTITY_UPDATED, id, org, action);
     }
 
     public DigitalID findIdentity(String id) {

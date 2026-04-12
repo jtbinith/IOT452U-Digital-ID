@@ -6,6 +6,7 @@ import java.util.Map;
 import com.digitalid.domain.DigitalID;
 import com.digitalid.domain.OrganisationType;
 import com.digitalid.repository.IdentityRepository;
+import com.digitalid.audit.AuditEventType;
 import com.digitalid.audit.AuditService;
 import com.digitalid.verification.*;
 import com.digitalid.exception.IdentityNotFoundException;
@@ -32,7 +33,7 @@ public class VerificationService {
         VerificationStrategy strategy = strategies.get(org);
         VerificationResult result = strategy.verify(identity);
 
-        auditService.recordEvent("VERIFICATION_REQUESTED", id, org,
+        auditService.recordEvent(AuditEventType.VERIFICATION_REQUESTED, id, org,
             result.isValid() ? "VALID" : "INVALID - " + result.getReason());
 
         return result;
@@ -44,7 +45,7 @@ public class VerificationService {
         TaxAuthorityVerificationStrategy strategy = (TaxAuthorityVerificationStrategy) strategies.get(org);
         VerificationResult result = strategy.verify(identity, from, to);
 
-        auditService.recordEvent("VERIFICATION_REQUESTED", id, org,
+        auditService.recordEvent(AuditEventType.VERIFICATION_REQUESTED, id, org,
             result.isValid() ? "VALID" : "INVALID - " + result.getReason());
 
         return result;
