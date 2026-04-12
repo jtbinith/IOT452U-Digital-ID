@@ -17,7 +17,7 @@ import com.digitalid.exception.UnauthorisedAccessException;
 import com.digitalid.repository.IdentityRepository;
 import com.digitalid.util.IdGenerator;
 
-// identity management: creation, updates, status changes, restrcitions, lookups
+// identity management: creation, updates, status changes, restrictions, lookups
 
 public class IdentityService {
 

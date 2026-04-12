@@ -1,7 +1,7 @@
 package com.digitalid.audit;
 
 import java.time.LocalDateTime;
-import com.digitalid.domain.OrganisationType;;
+import com.digitalid.domain.OrganisationType;
 
 public class AuditLogEntry {
     

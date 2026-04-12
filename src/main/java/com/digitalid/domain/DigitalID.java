@@ -62,31 +62,29 @@ public class DigitalID {
 
     // update methods
     public void updateNationality(String nationality) {
-        if (this.status == IdentityStatus.REVOKED) {
-            throw new IllegalStateException("Cannot modify identity " + this.id + ": status is " + this.status);
-        }
+        ensureNotRevoked();
         this.nationality = nationality;
     }
 
     public void updateAddress(String address) {
-        if (this.status == IdentityStatus.REVOKED) {
-            throw new IllegalStateException("Cannot modify identity " + this.id + ": status is " + this.status);
-        }
+        ensureNotRevoked();
         this.address = address;
     }
 
     public void updatePostcode(String postcode) {
-        if (this.status == IdentityStatus.REVOKED) {
-            throw new IllegalStateException("Cannot modify identity " + this.id + ": status is " + this.status);
-        }
+        ensureNotRevoked();
         this.postcode = postcode;
     }
 
     public void setRestriction(boolean restricted) {
+        ensureNotRevoked();
+        this.restricted = restricted;
+    }
+
+    private void ensureNotRevoked() {
         if (this.status == IdentityStatus.REVOKED) {
             throw new IllegalStateException("Cannot modify identity " + this.id + ": status is " + this.status);
         }
-        this.restricted = restricted;
     }
 
     // query methods

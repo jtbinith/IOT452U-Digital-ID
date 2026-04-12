@@ -2,7 +2,6 @@ package com.digitalid.audit;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import com.digitalid.domain.OrganisationType;
 
 public class AuditService {
@@ -15,11 +14,5 @@ public class AuditService {
 
     public List<AuditLogEntry> getAuditLogs() {
         return new ArrayList<>(auditLogs);
-    }
-
-    public List<AuditLogEntry> getLogsForIdentity(String identityId) {
-        return auditLogs.stream()
-            .filter(entry -> identityId.equals(entry.getIdentityId()))
-            .collect(Collectors.toList());
     }
 }

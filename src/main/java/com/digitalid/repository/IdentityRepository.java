@@ -10,8 +10,4 @@ public interface IdentityRepository {
     DigitalID findById(String id);
 
     List<DigitalID> findAll();
-
-    void delete(String id);
-
-    boolean exists(String id);
 }

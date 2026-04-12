@@ -24,8 +24,4 @@ public class StatusTransitionValidator {
             throw new InvalidStatusTransitionException(identityId, current, target);
         }
     }
-
-    public List<IdentityStatus> getAllowedTransitions(IdentityStatus current) {
-        return allowedTransitions.get(current);
-    }
 }

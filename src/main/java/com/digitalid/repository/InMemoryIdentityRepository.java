@@ -23,14 +23,4 @@ public class InMemoryIdentityRepository implements IdentityRepository {
     public List<DigitalID> findAll() {
         return new ArrayList<>(identities.values());
     }
-
-    @Override
-    public void delete(String id) {
-        identities.remove(id);
-    }
-
-    @Override
-    public boolean exists(String id) {
-        return identities.containsKey(id);
-    }
 }
