@@ -3,6 +3,7 @@ package com.digitalid.app;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Scanner;
 
 import com.digitalid.audit.AuditLogEntry;
@@ -191,8 +192,8 @@ public class TerminalApplication {
                     System.out.print("Enter field number to edit (1-7): ");
                     int field = readInt();
                     switch (field) {
-                        case 1 -> firstName = readNonEmpty("Enter first name: ");
-                        case 2 -> surname = readNonEmpty("Enter surname: ");
+                        case 1 -> firstName = readName("Enter first name: ");
+                        case 2 -> surname = readName("Enter surname: ");
                         case 3 -> gender = readValidGender("Enter gender (M)ale / (F)emale / (X) Other: ");
                         case 4 -> dob = readValidDob("Enter date of birth (DD-MM-YYYY): ");
                         case 5 -> nationality = readNonEmpty("Enter nationality (e.g. British, Irish, French): ");
@@ -401,7 +402,7 @@ public class TerminalApplication {
 
         try {
             LocalDate dob = LocalDate.parse(dobInput, DATE_FORMAT);
-            java.util.List<DigitalID> results = identityService.findIdentity(name, dob);
+            List<DigitalID> results = identityService.findIdentity(name, dob);
 
             if (results.isEmpty()) {
                 System.out.println("\nNo identities found.");
@@ -422,13 +423,13 @@ public class TerminalApplication {
     private void handleViewAuditLogs() {
         System.out.println("\n--- Audit Log ---\n");
 
-        java.util.List<AuditLogEntry> logs = auditService.getAuditLogs();
+        List<AuditLogEntry> logs = auditService.getAuditLogs();
 
         if (logs.isEmpty()) {
             System.out.println("No audit events recorded.");
         } else {
             for (AuditLogEntry entry : logs) {
-                System.out.println("  [" + entry.getTimestamp().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) + "] "
+                System.out.println("  [" + entry.getTimestamp().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) + "] "
                         + entry.getOperation() + " | ID: " + entry.getIdentityId()
                         + " | Org: " + entry.getOrganisation() + " | " + entry.getResult());
             }
@@ -449,7 +450,7 @@ public class TerminalApplication {
     }
 
     private void showRegisteredIdentities() {
-        java.util.List<DigitalID> identities = identityService.getAllIdentities();
+        List<DigitalID> identities = identityService.getAllIdentities();
         if (identities.isEmpty()) {
             System.out.println("No identities registered.\n");
         } else {
