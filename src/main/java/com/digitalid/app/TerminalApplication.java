@@ -138,8 +138,8 @@ public class TerminalApplication {
 
     private void handleCreateIdentity() {
         System.out.println("\n--- Create New Identity ---\n");
-        String firstName = readNonEmpty("Enter first name: ");
-        String surname = readNonEmpty("Enter surname: ");
+        String firstName = readName("Enter first name: ");
+        String surname = readName("Enter surname: ");
         String gender = readValidGender("Enter gender (M)ale / (F)emale / (X) Other: ");
         String dob = readValidDob("Enter date of birth (DD-MM-YYYY): ");
         String nationality = readNonEmpty("Enter nationality (e.g. British, Irish, French): ");
@@ -434,6 +434,20 @@ public class TerminalApplication {
             return Integer.parseInt(line.trim());
         } catch (NumberFormatException e) {
             return -1;
+        }
+    }
+
+    private String readName(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            if (input.isEmpty()) {
+                System.out.println("ERROR: This field cannot be empty.");
+            } else if (!input.matches("[a-zA-Z\\-' ]+")) {
+                System.out.println("ERROR: Name must contain only letters, hyphens or apostrophes.");
+            } else {
+                return input;
+            }
         }
     }
 
