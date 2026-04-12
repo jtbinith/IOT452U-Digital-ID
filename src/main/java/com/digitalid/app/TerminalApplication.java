@@ -229,6 +229,7 @@ public class TerminalApplication {
 
     private void handleUpdateIdentity() {
         System.out.println("\n--- Update Identity ---\n");
+        showRegisteredIdentities();
         System.out.print("Enter Digital ID: ");
         String id = scanner.nextLine().trim();
 
@@ -275,6 +276,7 @@ public class TerminalApplication {
 
     private void handleChangeStatus() {
         System.out.println("\n--- Change Identity Status ---\n");
+        showRegisteredIdentities();
         System.out.print("Enter Digital ID: ");
         String id = scanner.nextLine().trim();
 
@@ -322,6 +324,7 @@ public class TerminalApplication {
 
     private void handleSetRestriction() {
         System.out.println("\n--- Set Identity Restriction ---\n");
+        showRegisteredIdentities();
         System.out.print("Enter Digital ID: ");
         String id = scanner.nextLine().trim();
 
@@ -348,6 +351,9 @@ public class TerminalApplication {
 
     private void handleVerifyIdentity() {
         System.out.println("\n--- Verify Identity ---\n");
+        if (currentOrganisation == OrganisationType.CENTRAL_AUTHORITY) {
+            showRegisteredIdentities();
+        }
         System.out.print("Enter Digital ID: ");
         String id = scanner.nextLine();
 
@@ -434,6 +440,19 @@ public class TerminalApplication {
             return Integer.parseInt(line.trim());
         } catch (NumberFormatException e) {
             return -1;
+        }
+    }
+
+    private void showRegisteredIdentities() {
+        java.util.List<DigitalID> identities = identityService.getAllIdentities();
+        if (identities.isEmpty()) {
+            System.out.println("No identities registered.\n");
+        } else {
+            System.out.println("Registered identities:");
+            for (DigitalID id : identities) {
+                System.out.println("  " + id.getId() + " | " + id.getFullName() + " | " + id.getStatus());
+            }
+            System.out.println();
         }
     }
 
