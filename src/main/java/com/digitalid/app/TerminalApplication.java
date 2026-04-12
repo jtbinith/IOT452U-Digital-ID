@@ -230,8 +230,9 @@ public class TerminalApplication {
     private void handleUpdateIdentity() {
         System.out.println("\n--- Update Identity ---\n");
         showRegisteredIdentities();
-        System.out.print("Enter Digital ID: ");
+        System.out.print("Enter Digital ID (or 0 to cancel): ");
         String id = scanner.nextLine().trim();
+        if (id.equals("0") || id.isEmpty()) return;
 
         try {
             DigitalID identity = identityService.findIdentity(id);
@@ -277,8 +278,9 @@ public class TerminalApplication {
     private void handleChangeStatus() {
         System.out.println("\n--- Change Identity Status ---\n");
         showRegisteredIdentities();
-        System.out.print("Enter Digital ID: ");
+        System.out.print("Enter Digital ID (or 0 to cancel): ");
         String id = scanner.nextLine().trim();
+        if (id.equals("0") || id.isEmpty()) return;
 
         try {
             DigitalID identity = identityService.findIdentity(id);
@@ -325,8 +327,9 @@ public class TerminalApplication {
     private void handleSetRestriction() {
         System.out.println("\n--- Set Identity Restriction ---\n");
         showRegisteredIdentities();
-        System.out.print("Enter Digital ID: ");
+        System.out.print("Enter Digital ID (or 0 to cancel): ");
         String id = scanner.nextLine().trim();
+        if (id.equals("0") || id.isEmpty()) return;
 
         try {
             DigitalID identity = identityService.findIdentity(id);
@@ -354,8 +357,9 @@ public class TerminalApplication {
         if (currentOrganisation == OrganisationType.CENTRAL_AUTHORITY) {
             showRegisteredIdentities();
         }
-        System.out.print("Enter Digital ID: ");
-        String id = scanner.nextLine();
+        System.out.print("Enter Digital ID (or 0 to cancel): ");
+        String id = scanner.nextLine().trim();
+        if (id.equals("0") || id.isEmpty()) return;
 
         try {
             if (currentOrganisation == OrganisationType.CENTRAL_AUTHORITY) {
@@ -389,8 +393,9 @@ public class TerminalApplication {
 
     private void handleFindIdentity() {
         System.out.println("\n--- Find Identity ---\n");
-        System.out.print("Enter full name: ");
+        System.out.print("Enter full name (or 0 to cancel): ");
         String name = scanner.nextLine().trim();
+        if (name.equals("0") || name.isEmpty()) return;
         System.out.print("Enter date of birth (dd-MM-yyyy): ");
         String dobInput = scanner.nextLine().trim();
 
@@ -465,7 +470,7 @@ public class TerminalApplication {
             } else if (!input.matches("[a-zA-Z\\-' ]+")) {
                 System.out.println("ERROR: Name must contain only letters, hyphens or apostrophes.");
             } else {
-                return input;
+                return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
             }
         }
     }
