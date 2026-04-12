@@ -91,5 +91,39 @@ class VerificationStrategyTest {
         assertTrue(result.getReason().toLowerCase().contains("suspended"));
     }
 
+    @Test
+    void welfareShouldReturnValidForActiveIdentityWithNoSuspensions() {
+        VerificationResult result = new WelfareAuthorityVerificationStrategy().verify(identity);
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    void welfareShouldReturnValidForIdentityWithOneSuspension() {
+        identity.suspend();
+        identity.activate();
+        VerificationResult result = new WelfareAuthorityVerificationStrategy().verify(identity);
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    void welfareShouldReturnInvalidForIdentityWithExcessiveSuspensions() {
+        identity.suspend();
+        identity.activate();
+        identity.suspend();
+        identity.activate();
+        identity.suspend();
+        identity.activate();
+        VerificationResult result = new WelfareAuthorityVerificationStrategy().verify(identity);
+        assertFalse(result.isValid());
+        assertTrue(result.getReason().toLowerCase().contains("suspension"));
+    }
+
+    @Test
+    void welfareShouldReturnInvalidForInactiveIdentity() {
+        identity.revoke();
+        VerificationResult result = new WelfareAuthorityVerificationStrategy().verify(identity);
+        assertFalse(result.isValid());
+    }
+
 }
 

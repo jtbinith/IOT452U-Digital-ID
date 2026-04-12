@@ -140,4 +140,14 @@ class DigitalIDTest {
         identity.suspend();
         assertFalse(identity.wasSuspendedBetween(LocalDate.now().plusDays(10), LocalDate.now().plusDays(20)));
     }
+
+    @Test
+    void shouldCountSuspensions() {
+        assertEquals(0, identity.getSuspensionCount());
+        identity.suspend();
+        assertEquals(1, identity.getSuspensionCount());
+        identity.activate();
+        identity.suspend();
+        assertEquals(2, identity.getSuspensionCount());
+    }
 }
