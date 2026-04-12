@@ -616,7 +616,11 @@ public class TerminalApplication {
         DigitalID tom = identityService.createIdentity("Tom", "Williams", "Male", "12-01-1978", "British", "", "", ca);
         identityService.createIdentity("Alex", "Hollow-Bales", "Other", "22-09-1995", "Spanish", "8 High Street", "N1 9GU", ca);
 
-        // James — suspend then reactivate (creates suspension history)
+        // James — suspend and reactivate 3 times (creates suspension history for Welfare Authority demo)
+        identityService.suspendIdentity(james.getId(), ca);
+        identityService.activateIdentity(james.getId(), ca);
+        identityService.suspendIdentity(james.getId(), ca);
+        identityService.activateIdentity(james.getId(), ca);
         identityService.suspendIdentity(james.getId(), ca);
         identityService.activateIdentity(james.getId(), ca);
         // Aisha — set restriction

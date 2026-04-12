@@ -28,7 +28,7 @@ mvn compile -q && java -cp target/classes com.digitalid.app.TerminalApplication 
 
 Demo mode loads five identities in different states:
 - Sarah George - ACTIVE
-- James O'Brien - ACTIVE (was previously suspended - has suspension history)
+- James O'Brien - ACTIVE (suspended 3 times - has extensive suspension history)
 - Aisha Rajan - ACTIVE, RESTRICTED
 - Tom Williams - REVOKED
 - Alex Hollow-Bales - ACTIVE
