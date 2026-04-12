@@ -74,5 +74,22 @@ class VerificationStrategyTest {
         assertTrue(result.getReason().toLowerCase().contains("restriction"));
     }
 
+    @Test
+    void taxAuthorityShouldReturnValidWhenNoSuspensionInPeriod() {
+        TaxAuthorityVerificationStrategy strategy = new TaxAuthorityVerificationStrategy();
+        VerificationResult result = strategy.verify(identity, LocalDate.now().minusDays(30), LocalDate.now());
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    void taxAuthorityShouldReturnInvalidWhenSuspendedDuringPeriod() {
+        identity.suspend();
+        identity.activate();
+        TaxAuthorityVerificationStrategy strategy = new TaxAuthorityVerificationStrategy();
+        VerificationResult result = strategy.verify(identity, LocalDate.now().minusDays(1), LocalDate.now().plusDays(1));
+        assertFalse(result.isValid());
+        assertTrue(result.getReason().toLowerCase().contains("suspended"));
+    }
+
 }
 

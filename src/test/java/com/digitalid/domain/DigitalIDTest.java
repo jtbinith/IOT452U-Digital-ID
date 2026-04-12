@@ -117,4 +117,27 @@ class DigitalIDTest {
         identity.revoke();
         assertThrows(IllegalStateException.class, () -> identity.updatePostcode("CB1 8GB"));
     }
+
+    @Test
+    void newIdentityShouldHaveEmptyStatusHistory() {
+        assertTrue(identity.getStatusHistory().isEmpty());
+    }
+
+    @Test
+    void suspendShouldRecordStatusHistory() {
+        identity.suspend();
+        assertFalse(identity.getStatusHistory().isEmpty());
+    }
+
+    @Test
+    void shouldDetectSuspensionDuringPeriod() {
+        identity.suspend();
+        assertTrue(identity.wasSuspendedBetween(LocalDate.now().minusDays(1), LocalDate.now().plusDays(1)));
+    }
+
+    @Test
+    void shouldNotDetectSuspensionOutsidePeriod() {
+        identity.suspend();
+        assertFalse(identity.wasSuspendedBetween(LocalDate.now().plusDays(10), LocalDate.now().plusDays(20)));
+    }
 }
