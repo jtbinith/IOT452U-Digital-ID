@@ -27,10 +27,7 @@ public class VerificationService {
     }
 
     public VerificationResult verifyIdentity(String id, OrganisationType org) {
-        DigitalID identity = repository.findById(id);
-        if (identity == null) {
-            throw new IdentityNotFoundException(id);
-        }
+        DigitalID identity = findIdentityOrThrow(id);
 
         VerificationStrategy strategy = strategies.get(org);
         VerificationResult result = strategy.verify(identity);
@@ -42,10 +39,7 @@ public class VerificationService {
     }
 
     public VerificationResult verifyIdentityWithPeriod(String id, OrganisationType org, LocalDate from, LocalDate to) {
-        DigitalID identity = repository.findById(id);
-        if (identity == null) {
-            throw new IdentityNotFoundException(id);
-        }
+        DigitalID identity = findIdentityOrThrow(id);
 
         TaxAuthorityVerificationStrategy strategy = (TaxAuthorityVerificationStrategy) strategies.get(org);
         VerificationResult result = strategy.verify(identity, from, to);
@@ -54,5 +48,13 @@ public class VerificationService {
             result.isValid() ? "VALID" : "INVALID - " + result.getReason());
 
         return result;
+    }
+
+    private DigitalID findIdentityOrThrow(String id) {
+        DigitalID identity = repository.findById(id);
+        if (identity == null) {
+            throw new IdentityNotFoundException(id);
+        }
+        return identity;
     }
 }

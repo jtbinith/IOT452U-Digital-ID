@@ -144,7 +144,7 @@ public class TerminalApplication {
         String gender = readValidGender("Enter gender (M)ale / (F)emale / (X) Other: ");
         String dob = readValidDob("Enter date of birth (DD-MM-YYYY): ");
         String nationality = readNonEmpty("Enter nationality (e.g. British, Irish, French): ");
-        nationality = nationality.substring(0, 1).toUpperCase() + nationality.substring(1).toLowerCase();
+        nationality = capitalise(nationality);
         System.out.print("Enter address (or press Enter to skip): ");
         String address = scanner.nextLine().trim();
         String postcode = "";
@@ -199,7 +199,7 @@ public class TerminalApplication {
                         case 4 -> dob = readValidDob("Enter date of birth (DD-MM-YYYY): ");
                         case 5 -> {
                             nationality = readNonEmpty("Enter nationality (e.g. British, Irish, French): ");
-                            nationality = nationality.substring(0, 1).toUpperCase() + nationality.substring(1).toLowerCase();
+                            nationality = capitalise(nationality);
                         }
                         case 6 -> {
                             System.out.print("Enter address (or press Enter to clear): ");
@@ -257,7 +257,7 @@ public class TerminalApplication {
             switch (field) {
                 case 1 -> {
                     String nationality = readNonEmpty("Enter new nationality: ");
-                    nationality = nationality.substring(0, 1).toUpperCase() + nationality.substring(1).toLowerCase();
+                    nationality = capitalise(nationality);
                     identityService.updateNationality(id, nationality, currentOrganisation);
                     System.out.println("\nSUCCESS: Nationality updated to '" + nationality + "'");
                 }
@@ -511,7 +511,7 @@ public class TerminalApplication {
             } else if (!input.matches("[a-zA-Z\\-' ]+")) {
                 System.out.println("ERROR: Name must contain only letters, hyphens or apostrophes.");
             } else {
-                return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
+                return capitalise(input);
             }
         }
     }
@@ -567,6 +567,10 @@ public class TerminalApplication {
             }
             System.out.println("ERROR: Invalid UK postcode format (e.g. E1 7AA, CB1 3AB).");
         }
+    }
+
+    private String capitalise(String input) {
+        return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
 
     private String formatOrgName(OrganisationType org) {
