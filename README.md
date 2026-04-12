@@ -201,6 +201,17 @@ classDiagram
     DigitalIdException <|-- ImmutableAttributeException
 ```
 
+## Adding a New Organisation
+
+The system is designed to be extensible. Adding a new consuming organisation requires no changes to existing code:
+
+1. Add a new value to `OrganisationType` enum (e.g. `IMMIGRATION_AUTHORITY`)
+2. Create a new strategy class implementing `VerificationStrategy` (e.g. `ImmigrationAuthorityVerificationStrategy`)
+3. Register the strategy in `VerificationService` constructor (`strategies.put(...)`)
+4. Add the organisation to the selection menu in `TerminalApplication`
+
+The Welfare Authority was added this way after the core system was complete, demonstrating the Open/Closed Principle - the system is open for extension without modifying existing code.
+
 ## Key Design Decisions
 
 - **Domain-Centred Layered Architecture** - separates concerns so that domain logic is independent of the UI and storage mechanism. The service layer acts as a boundary, enforcing authorisation and audit logging before any domain operation.
