@@ -41,7 +41,7 @@ mvn clean test
 
 ## System Overview
 
-The system allows a Central Authority to create, update and manage the status of digital identities. Consuming organisations (Tax Authority, Driving Authority, Bank, Employer) can verify identities but cannot modify them. Each organisation receives only the information relevant to their needs.
+The system allows a Central Authority to create, update and manage the status of digital identities. Consuming organisations (Tax Authority, Driving Authority, Bank, Employer, Welfare Authority) can verify identities but cannot modify them. Each organisation receives only the information relevant to their needs.
 
 ### Package Structure
 
@@ -231,7 +231,7 @@ The Welfare Authority was added this way after the core system was complete, dem
 - **DigitalIDTest** - identity lifecycle, attribute updates, revoked state enforcement, status history
 - **StatusTransitionValidatorTest** - valid and invalid state transitions
 - **IdentityServiceTest** - service-level operations, authorisation rejection, audit recording
-- **VerificationStrategyTest** - all four strategies including reporting period checks
+- **VerificationStrategyTest** - all six strategies including reporting period and suspension count checks
 - **VerificationServiceTest** - service orchestration, strategy selection, error handling
 
 CI runs automatically on every push via GitHub Actions, executing `mvn clean test`.
