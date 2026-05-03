@@ -224,6 +224,10 @@ The Welfare Authority was added this way after the core system was complete, dem
 - **Exception Hierarchy** - an abstract base class provides a common structure, while specific subclasses carry context relevant to each error type. This allows callers to catch specific exceptions or handle all domain errors generically.
 - **Audit Logging** - all key actions are recorded with timestamp, organisation and outcome. The `AuditEventType` enum ensures event types are type-safe and consistent.
 
+## Development Process
+
+Development was tracked using a GitHub Kanban board with issues across four columns: Backlog, In Progress, Testing/CI, and Done. Each issue is labelled (bug, enhancement, testing, documentation) and linked to its implementing commit. Commits reference issue numbers for traceability.
+
 ## Testing
 
 57 JUnit 5 tests across 5 test files:
