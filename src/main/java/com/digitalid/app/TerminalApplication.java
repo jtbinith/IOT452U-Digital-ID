@@ -290,7 +290,7 @@ public class TerminalApplication {
                     System.out.println("\nSUCCESS: Address updated to '" + address + "'");
                 }
                 case 3 -> {
-                    String postcode = readNonEmpty("Enter new postcode: ");
+                    String postcode = readValidPostcode("Enter new postcode: ");
                     identityService.updatePostcode(id, postcode, currentOrganisation);
                     System.out.println("\nSUCCESS: Postcode updated to '" + postcode + "'");
                 }
